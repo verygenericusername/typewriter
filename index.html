@@ -1,0 +1,94 @@
+<html>
+<head>
+<title>Typewriter | Simple Text Editor</title>
+<link rel="icon" type="image/x-icon" src="favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<center>
+  <h1>
+  Typewriter
+  </h1>
+    File Name: <input id="filename" type="text" placeholder="Your File Name Here"> <button id="cleart">
+    Clear Title
+    </button>
+  <h4 id="sd">
+  Saved Docs: 
+  </h4>
+  <textarea id="text" style="resize:none;"></textarea>
+  <br>
+  <input type="file" accept=".txt" onchange="read(this)">
+  <button id="download" class="download">
+  Download as .txt
+  </button>
+  <button id="reset" class="reset">
+  Reset Saved Number
+  </button>
+  <br>
+  <button id="clear">
+  Clear Text
+  </button>
+  <audio>
+    <source src="key.wav" type="audio/wav">
+  </audio>
+</center>
+<script>
+var saved;
+var sd = document.getElementById("sd");
+var reset = document.getElementById("reset");
+var fn = document.getElementById("filename");
+var download = document.getElementById("download");
+var clear = document.getElementById("clear");
+var cleart = document.getElementById("cleart");
+if(!localStorage.getItem("saveddocs")){
+localStorage.setItem("saveddocs","0");
+saved = parseInt(localStorage.getItem("saveddocs"));
+} else {
+saved = parseInt(localStorage.getItem("saveddocs"));
+}
+var text = document.getElementById("text");
+text.addEventListener("input", function(){
+var key = new Audio("key.wav");
+key.play();
+});
+reset.addEventListener("click", function(){
+saved = 0;
+localStorage.setItem("saveddocs",saved);
+saved = localStorage.getItem("saveddocs");
+});
+download.addEventListener("click", function(){
+saved++;
+localStorage.setItem("saveddocs",saved);
+saved = localStorage.getItem("saveddocs");
+var data = text.value;
+var string = JSON.stringify(data);
+var blob = new Blob([data], {type: "application/json"});
+var url = URL.createObjectURL(blob);
+var a = document.createElement("a");
+a.href = url;
+a.download = fn.value + ".txt";
+a.click();
+});
+function read(input){
+var file = input.files[0];
+var reader = new FileReader();
+reader.readAsText(file);
+reader.onload = function(){
+text.value = reader.result;
+fn.value = file.name;
+var val = fn.value.replace(".txt","");
+fn.value = val;
+};
+}
+clear.addEventListener("click", function(){
+text.value = "";
+});
+cleart.addEventListener("click", function(){
+fn.value = "";
+});
+setInterval(function(){
+sd.innerHTML = "Saved Docs: " + saved;
+});
+</script>
+</body>
+</html>
