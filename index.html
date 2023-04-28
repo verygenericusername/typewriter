@@ -1,0 +1,167 @@
+  
+<html>
+<head>
+<title>Typewriter | Simple Text Editor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+body {
+  background-color:#08c955;
+}
+h1 {
+  color:white;
+  font-family: 'Roboto', sans-serif;
+}
+textarea {
+  font-family: 'Roboto', sans-serif;
+  height:400px;
+  width:600px;
+}
+h4 {
+  color:white;
+  font-family: 'Roboto', sans-serif;
+  position:relative;
+  left:220px;
+}
+input[type=file]{
+  z-index:1;
+  position:relative;
+  left:-40px;
+}
+.download {
+  z-index:2;
+  position:relative;
+  left:-50px;
+}
+.reset {
+  position:relative;
+  left:40px;
+}
+</style>
+</head>
+<body>
+<center>
+  <h1>
+  Typewriter
+  </h1>
+    File Name: <input id="filename" type="text" placeholder="Your File Name Here"> <button id="cleart">
+    Clear Title
+    </button>
+  <h4 id="sd">
+  Saved Docs: 
+  </h4>
+  Save As: <input type="radio" value="txt" name="saveas" checked> .txt | <input type="radio" value="html" name="saveas"> .html
+  <br> 
+  Sound: <input type="radio" name="sound" value="enabled" checked>Enabled | <input type="radio" name="sound" value="disable"> Disabled
+<br>
+  <textarea id="text" style="resize:none;"></textarea>
+  <br>
+  <input type="file" accept=".txt" onchange="read(this)">
+  <button id="download" class="download">
+  Download
+  </button>
+  <button id="reset" class="reset">
+  Reset Saved Number
+  </button>
+  <br>
+  <button id="clear">
+  Clear Text
+  </button>
+  <audio>
+    <source src="https://verygenericusername.github.io/typewriter_sim/key.wav" type="audio/wav">
+  </audio>
+</center>
+<script>
+var saved;
+var sd = document.getElementById("sd");
+var reset = document.getElementById("reset");
+var fn = document.getElementById("filename");
+var download = document.getElementById("download");
+var clear = document.getElementById("clear");
+var cleart = document.getElementById("cleart");
+var saveasr = document.getElementsByName("saveas");
+var saveas = "txt";
+var sr = document.getElementsByName("sound");
+if(!localStorage.getItem("saveddocs")){
+localStorage.setItem("saveddocs","0");
+saved = parseInt(localStorage.getItem("saveddocs"));
+} else {
+saved = parseInt(localStorage.getItem("saveddocs"));
+}
+var text = document.getElementById("text");
+text.addEventListener("input", function(){
+var key = new Audio("https://verygenericusername.github.io/typewriter_sim/key.wav");
+for(let i = 0; i < sr.length; i++){
+if(sr[i].value === "enabled" && sr[i].checked){
+key.play();
+}else{
+key.remove();
+}
+}
+});
+reset.addEventListener("click", function(){
+saved = 0;
+localStorage.setItem("saveddocs",saved);
+saved = localStorage.getItem("saveddocs");
+});
+download.addEventListener("click", function(){
+saved++;
+localStorage.setItem("saveddocs",saved);
+saved = localStorage.getItem("saveddocs");
+var data = text.value;
+var string = JSON.stringify(data);
+var blob = new Blob([data], {type: "application/json"});
+var url = URL.createObjectURL(blob);
+var a = document.createElement("a");
+a.href = url;
+//a.download = fn.value + ".txt";
+if(saveas === "txt"){
+a.download = fn.value + ".txt";
+}
+if(saveas === "html"){
+var HTMLCONTENT = `<html><head><title>${fn.value}</title></head><body><center><h3>${fn.value}</h3><p>${data}</p></center></body></html>`;
+var blobb = new Blob([HTMLCONTENT], {type: "text/html"});
+var url2 = URL.createObjectURL(blobb);
+a.href = url2;
+a.download = fn.value + ".html";
+}
+a.click();
+});
+function read(input){
+var file = input.files[0];
+var reader = new FileReader();
+reader.readAsText(file);
+reader.onload = function(){
+text.value = reader.result;
+fn.value = file.name;
+var val = fn.value.replace("." + saveas,"");
+fn.value = val;
+};
+}
+clear.addEventListener("click", function(){
+text.value = "";
+});
+cleart.addEventListener("click", function(){
+fn.value = "";
+});
+for(let i = 0; i < saveasr.length; i++){
+saveasr[i].addEventListener("click", function(){
+if(this.checked){
+if(saveasr[i].value === "pdf"){
+saveas = "pdf";
+}
+if(saveasr[i].value === "txt"){
+saveas = "txt";
+}
+if(saveasr[i].value === "html"){
+saveas = "html";
+}
+}
+});
+}
+setInterval(function(){
+download.innerHTML = "Download as ." + saveas;
+sd.innerHTML = "Saved Docs: " + saved;
+});
+</script>
+</body>
+</html>
